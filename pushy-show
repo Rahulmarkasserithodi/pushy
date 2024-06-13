@@ -1,0 +1,39 @@
+#!/bin/dash
+#pushy-show
+#This script is used to display the contents of a file from a specific commit or the staging area (index) if no commit is specified. It separates the input argument into commit number and filename, handling errors related to incorrect usage, non-existent commits, or missing files. Depending on the input, it fetches and prints the content of the specified file either from the appropriate commit directory or the index.
+#=========================================================================================================================================
+
+# Split input argument into commit and filename
+commit=$(echo "$1" | cut -d':' -f1)
+filename=$(echo "$1" | cut -d':' -f2)
+
+if [ -z "$filename" ]; then
+    echo "pushy-show: error: invalid usage"
+    echo "Usage: pushy-show [commit]:filename"
+    exit 1
+fi
+
+index_file_path=".pushy/index/$filename"
+commit_file_path=".pushy/commits/commit.$commit/$filename"
+
+if [ -z "$commit" ] || [ "$commit" = ":" ]; then
+    # If commit is not specified or only ":" is provided, show file from index
+    if [ ! -f "$index_file_path" ]; then
+        echo "pushy-show: error: '$filename' not found in index"
+        exit 1
+    fi
+    cat "$index_file_path"
+else
+    # If commit is specified, show file from that commit
+    if [ ! -d ".pushy/commits/commit.$commit" ]; then
+        echo "pushy-show: error: unknown commit '$commit'"
+        exit 1
+    elif [ ! -f "$commit_file_path" ]; then
+        echo "pushy-show: error: '$filename' not found in commit $commit"
+        exit 1
+    else
+        cat "$commit_file_path"
+    fi
+fi
+
+

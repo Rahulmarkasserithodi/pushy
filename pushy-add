@@ -1,0 +1,28 @@
+#!/bin/dash
+#pushy-add
+#This script stages files for the next commit by copying them into the .pushy/index directory. Before staging, it verifies that the .pushy repository exists and that the files specified by the user exist and are regular files. If any checks fail, it produces an error message detailing the problem.
+#=====================================================================================================================
+# Check if .pushy repository is initialized
+if [ ! -d ".pushy" ]; then
+    echo "pushy-add: error: pushy repository directory .pushy not found"
+    exit 1
+fi
+
+# Check if at least one file is provided
+if [ "$#" -eq 0 ]; then
+    echo "pushy-add: error: no files specified"
+    exit 1
+fi
+
+# Add files to the index
+for file in "$@"; do
+    # Check if file exists and is a regular file
+    if [ ! -f "$file" ]; then
+        echo "pushy-add: error: can not open '$file'"
+        exit 1
+    fi
+
+    # Assuming the index is a simple directory structure within .pushy
+    cp "$file" ".pushy/index/"
+done
+

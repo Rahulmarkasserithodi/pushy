@@ -1,0 +1,49 @@
+#!/bin/dash
+
+# Assuming .pushy/index exists and is a file in an initialized repository
+index=".pushy/index"
+
+# Check if the pushy repository is initialized by checking for .pushy directory and .pushy/index file
+if [ ! -d ".pushy" ] || [ ! -f "$index" ]; then
+    echo "Error: pushy repository not initialized properly."
+    exit 1
+fi
+
+# Initialize variables
+cached=0
+files=""
+
+# Parse options and arguments
+for arg in "$@"; do
+    if [ "$arg" = "--cached" ]; then
+        cached=1
+    else
+        files="$files $arg"
+    fi
+done
+
+# Function to remove a file from the index
+remove_from_index() {
+    local file="$1"
+    grep -v "^$file$" "$index" > "$index.tmp" && mv "$index.tmp" "$index"
+}
+
+# Process each file
+for file in $files; do
+    if [ "$cached" -eq 0 ]; then
+        if [ -f "$file" ]; then
+            rm "$file"
+        else
+            echo "Error: '$file' not found in the working directory."
+            continue
+        fi
+    fi
+    
+    if grep -q "^$file$" "$index"; then
+        remove_from_index "$file"
+    else
+        echo "Error: '$file' is not in the pushy repository."
+    fi
+done
+
+

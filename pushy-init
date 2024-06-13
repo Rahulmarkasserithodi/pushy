@@ -1,0 +1,15 @@
+#!/bin/dash
+#pushy-init
+#This script initializes a new "pushy" repository in the current directory. It creates a .pushy directory, which houses an index subdirectory for staging changes and a log file for tracking commits. If .pushy already exists, it notifies the user to prevent reinitialization.
+#========================================================================================================================
+# Create .pushy directory
+if [ -d ".pushy" ]; then
+    echo "pushy-init: error: .pushy already exists" 
+    exit 1
+else
+    mkdir .pushy 
+    echo "Initialized empty pushy repository in .pushy"
+    mkdir .pushy/index
+    touch .pushy/log
+fi
+

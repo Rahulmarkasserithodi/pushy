@@ -1,0 +1,22 @@
+#!/bin/dash
+#pushy-log
+#This displays the commit history in reverse chronological order (latest first). This script reads the commit messages logged in .pushy/commit-log.txt, extracting and printing each commit's number and message. If no commits are found, it indicates that no commits have been made yet.
+#================================================================================================================================
+# Path to the commit log file
+commit_log_file=".pushy/commit-log.txt"
+
+# Check if the commit log exists and is not empty
+if [ ! -s "$commit_log_file" ]; then
+    echo "No commits found."
+    exit 1
+fi
+
+# Display the contents of the commit log
+# Assuming the commit log format is "commit_number commit_message"
+tac "$commit_log_file" | while read -r line; do
+    commit_number=$(echo "$line" | cut -d ' ' -f1)
+    commit_message=$(echo "$line" | cut -d ' ' -f2-)
+    echo "$commit_number $commit_message"
+done
+
+
